@@ -1,0 +1,85 @@
+# 每日理财指南配置文件
+# 资金配置
+portfolio:
+  total_capital: 5000000  # 总资金 500万
+  currency: CNY
+  
+  # 资产配置约束 (比例范围)
+  constraints:
+    liquidity:
+      min_ratio: 0.20      # 最低流动性资产 20%
+      assets: ["货币基金", "银行理财T+0"]
+    
+    fixed_income:
+      min_ratio: 0.30      # 固定收益类 30-60%
+      max_ratio: 0.60
+      assets: ["银行理财", "债券", "保险理财"]
+    
+    equity:
+      min_ratio: 0.20      # 权益类 20-50%
+      max_ratio: 0.50
+      assets: ["公募基金", "股票"]
+    
+    alternative:
+      max_ratio: 0.15      # 另类投资 0-15%
+      assets: ["黄金", "外汇"]
+  
+  # 目标配置 (优化后的目标比例)
+  target_allocation:
+    货币基金: 0.25
+    银行理财: 0.30
+    债券: 0.15
+    公募基金: 0.20
+    黄金: 0.05
+    外汇: 0.05
+  
+  # 再平衡阈值
+  rebalance_threshold: 0.05  # 偏离5%时触发再平衡
+
+# 风险参数
+risk:
+  max_drawdown: 0.20        # 最大回撤限制 20%
+  var_confidence: 0.95      # VaR 置信度
+  risk_free_rate: 0.02     # 无风险利率 2%
+
+# 优化模型参数
+optimization:
+  method: "risk_parity"     # 优化方法: mpt, risk_parity, black_litterman
+  expected_market_return: 0.05  # 市场预期收益率
+  covariance_method: "historical"  # 协方差计算方法
+
+# 数据源配置
+data_sources:
+  fund:
+    provider: "eastmoney"   # 天天基金
+    api_url: "https://api.fund.eastmoney.com"
+  
+  bank_product:
+    provider: "rong360"   # 融360
+    scrape: true
+  
+  bond:
+    provider: "sina"       # 新浪债券
+    api_url: "https://finance.sina.com.cn"
+  
+  forex:
+    provider: "exchangerate-api"
+    api_url: "https://api.exchangerate-api.com/v4/latest/CNY"
+
+# 飞书配置
+feishu:
+  webhook_url: "${FEISHU_WEBHOOK_URL}"  # 从环境变量读取
+  chat_id: "${FEISHU_CHAT_ID}"
+  push_time: "09:00"       # 每日推送时间
+  enabled: true
+
+# 服务器配置
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

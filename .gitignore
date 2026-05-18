@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data & Logs
+data/
+*.db
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+
+# macOS
+.DS_Store
+*.icloud
+
+# Dependencies (install via pip)
+# requirements.txt is committed but not the installed packages
