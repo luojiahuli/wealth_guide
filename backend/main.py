@@ -129,7 +129,7 @@ async def get_portfolio() -> Portfolio:
         
         # 执行优化
         logger.info("正在优化组合...")
-        result = _optimizer.optimize(method="risk_parity")
+        result = _optimizer.optimize(method="target")
         
         # 生成推荐
         logger.info("正在生成推荐...")
@@ -200,7 +200,7 @@ async def get_recommendations() -> Recommendation:
         _optimizer.build_asset_classes_from_data(asset_data["assets"])
         
         # 执行优化
-        result = _optimizer.optimize(method="risk_parity")
+        result = _optimizer.optimize(method="target")
         
         # 生成推荐
         recommendation = _recommender.generate_recommendation(

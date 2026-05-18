@@ -367,6 +367,58 @@ class PortfolioOptimizer:
         
         return weights
 
+    def optimize_target_allocation(self) -> dict[str, float]:
+        """
+        直接使用目标配置，不做复杂优化
+        用于固定配置比例的场景
+        """
+        # 使用更新后的目标配置（银行理财35%）
+        self.target_allocation = {
+            "货币基金": 0.20,
+            "银行理财": 0.35,
+            "债券": 0.15,
+            "公募基金": 0.20,
+            "黄金": 0.05,
+            "外汇": 0.05,
+        }
+
+        # 定义各资产类别的预期收益和波动率
+        asset_params = {
+            "货币基金-余额宝": {"return": 0.021, "vol": 0.005, "liquidity": "T+0", "risk": "极低"},
+            "银行理财-招行聚益生金": {"return": 0.035, "vol": 0.02, "liquidity": "T+1", "risk": "低"},
+            "债券-AAA企业债": {"return": 0.040, "vol": 0.05, "liquidity": "T+1", "risk": "中低"},
+            "基金-易方达蓝筹精选": {"return": 0.08, "vol": 0.18, "liquidity": "T+2", "risk": "中"},
+            "黄金-华安黄金ETF": {"return": 0.03, "vol": 0.15, "liquidity": "T+1", "risk": "中高"},
+            "外汇-美元": {"return": 0.02, "vol": 0.10, "liquidity": "T+1", "risk": "中"},
+        }
+
+        # 添加到 asset_classes
+        for name, params in asset_params.items():
+            self.asset_classes[name] = AssetClass(
+                name=name,
+                expected_return=params["return"],
+                volatility=params["vol"],
+                sharpe_ratio=(params["return"] - self.risk_free_rate) / params["vol"] if params["vol"] > 0 else 0,
+                liquidity=params["liquidity"],
+                risk_level=params["risk"]
+            )
+
+        # 构建详细权重
+        detailed = {}
+        for cat, ratio in self.target_allocation.items():
+            asset_map = {
+                "货币基金": "货币基金-余额宝",
+                "银行理财": "银行理财-招行聚益生金",
+                "债券": "债券-AAA企业债",
+                "公募基金": "基金-易方达蓝筹精选",
+                "黄金": "黄金-华安黄金ETF",
+                "外汇": "外汇-美元",
+            }
+            if cat in asset_map:
+                detailed[asset_map[cat]] = ratio
+
+        return detailed
+
     def aggregate_to_target_categories(self, detailed_weights: dict[str, float]) -> dict[str, dict]:
         """
         将详细资产权重聚合到目标资产类别
@@ -448,18 +500,24 @@ class PortfolioOptimizer:
             weights=weights
         )
 
-    def optimize(self, method: str = "risk_parity") -> dict:
+    def optimize(self, method: str = "target") -> dict:
         """
         执行优化
+        target: 直接使用目标配置（推荐）
+        risk_parity: 风险平价
+        max_sharpe: 最大夏普比率
+        mpt: 现代投资组合理论
         """
-        if method == "risk_parity":
+        if method == "target":
+            detailed_weights = self.optimize_target_allocation()
+        elif method == "risk_parity":
             detailed_weights = self.optimize_risk_parity()
         elif method == "max_sharpe":
             detailed_weights = self.optimize_max_sharpe()
         elif method == "mpt":
             detailed_weights = self.optimize_mpt()
         else:
-            detailed_weights = self.optimize_risk_parity()
+            detailed_weights = self.optimize_target_allocation()
         
         # 聚合到目标类别
         aggregated = self.aggregate_to_target_categories(detailed_weights)
