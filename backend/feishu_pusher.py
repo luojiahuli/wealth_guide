@@ -77,6 +77,10 @@ class FeishuPusher:
         outlook = recommendation.get("market_outlook", "维持当前配置")
 
         # 组装消息
+        alloc_text = "\n".join(alloc_lines)
+        action_text = "\n".join(action_lines) if action_lines else "• 暂无调仓建议"
+        pick_text = "\n".join(pick_lines) if pick_lines else "• 暂无精选推荐"
+
         message = f"""📊 每日理财指南 | {date_str}
 
 💰 资产状况
@@ -86,13 +90,13 @@ class FeishuPusher:
 VaR(95%): {var_95:.2f}%
 
 📈 最优配置建议
-" + "\n".join(alloc_lines) + f"""
+{alloc_text}
 
 💡 今日操作建议
-" + ("\n".join(action_lines) if action_lines else "• 暂无调仓建议") + f"""
+{action_text}
 
 🎯 精选推荐
-" + ("\n".join(pick_lines) if pick_lines else "• 暂无精选推荐") + f"""
+{pick_text}
 
 📋 市场展望
 {outlook}

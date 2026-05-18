@@ -215,8 +215,8 @@ class Recommender:
 _recommender: Recommender | None = None
 
 
-def get_recommender() -> Recommender:
+def get_recommender(optimizer=None) -> Recommender:
     global _recommender
     if _recommender is None:
-        _recommender = Recommender()
+        _recommender = Recommender(optimizer)
     return _recommender

@@ -122,7 +122,7 @@ async def get_portfolio() -> Portfolio:
         
         # 获取资产数据
         logger.info("正在获取资产数据...")
-        asset_data = await _data_fetcher.get_all_asset_data()
+        asset_data = _data_fetcher.get_all_asset_data()
         
         # 构建资产类别
         _optimizer.build_asset_classes_from_data(asset_data["assets"])
@@ -191,10 +191,10 @@ async def get_recommendations() -> Recommendation:
             raise HTTPException(status_code=503, detail="服务初始化中")
         
         # 获取资产数据
-        asset_data = await _data_fetcher.get_all_asset_data()
+        asset_data = _data_fetcher.get_all_asset_data()
         
         # 获取市场指标
-        market_indicators = await _data_fetcher.get_market_indicators()
+        market_indicators = _data_fetcher.get_market_indicators()
         
         # 构建资产类别
         _optimizer.build_asset_classes_from_data(asset_data["assets"])
@@ -227,7 +227,7 @@ async def get_assets(asset_type: str):
         if not _data_fetcher:
             raise HTTPException(status_code=503, detail="服务初始化中")
         
-        data = await _data_fetcher.get_all_asset_data()
+        data = _data_fetcher.get_all_asset_data()
         
         if asset_type == "all":
             return AssetDataResponse(
@@ -256,7 +256,7 @@ async def get_market() -> MarketIndicators:
         if not _data_fetcher:
             raise HTTPException(status_code=503, detail="服务初始化中")
         
-        indicators = await _data_fetcher.get_market_indicators()
+        indicators = _data_fetcher.get_market_indicators()
         return MarketIndicators(**indicators)
         
     except Exception as e:

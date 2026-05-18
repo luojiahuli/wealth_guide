@@ -54,14 +54,14 @@ class PortfolioOptimizer:
             "alternative_max": 0.15,    # 另类投资最高 15%
         }
         
-        # 目标配置
+        # 目标配置 (优化后的目标比例)
         self.target_allocation = {
-            "货币基金": 0.25,
-            "银行理财": 0.30,
+            "货币基金": 0.15,
+            "银行理财": 0.40,
             "债券": 0.15,
-            "公募基金": 0.20,
+            "公募基金": 0.15,
             "黄金": 0.05,
-            "外汇": 0.05,
+            "外汇": 0.10,
         }
 
     def add_asset_class(self, name: str, expected_return: float, 
