@@ -1,30 +1,32 @@
-# 每日理财指南 - Python 依赖
+# Wealth Guide - Python Dependencies v2.0
 
-# Web框架
+# Web Framework
 fastapi==0.109.2
 uvicorn[standard]==0.27.1
 python-multipart==0.0.9
 
-# 数据处理
+# Data Processing
 pandas==2.2.0
 numpy==1.26.3
+
+# Financial Data (optional - will fallback to mock data if unavailable)
 akshare==1.14.18
 
-# 优化引擎
+# Optimization Engine
 cvxpy==1.5.2
 scipy==1.12.0
 
-# HTTP客户端
+# HTTP Client
 httpx==0.26.0
 
-# 数据库
+# Database
 aiosqlite==0.19.0
 
-# 配置管理
+# Configuration
 pyyaml==6.0.1
 pydantic==2.6.1
 pydantic-settings==2.1.0
 
-# 工具
+# Utilities
 python-dotenv==1.0.1
 requests==2.31.0
