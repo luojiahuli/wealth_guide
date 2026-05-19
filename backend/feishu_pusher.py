@@ -317,6 +317,54 @@ class FeishuPusher:
         """推送每日报告 (默认使用卡片格式)"""
         return self.push_card_report(portfolio, recommendation)
 
+    def push_screenshot(self, image_path: str) -> bool:
+        """推送本地截图到飞书"""
+        if not self.enabled:
+            logger.warning("飞书推送未配置，跳过")
+            return False
+
+        import mimetypes
+        token = self._get_access_token()
+        if not token:
+            logger.error("无法获取 access token")
+            return False
+
+        mime_type = mimetypes.guess_type(image_path)[0] or "image/png"
+        filename = os.path.basename(image_path)
+
+        try:
+            with open(image_path, "rb") as f:
+                image_data = f.read()
+
+            # 上传图片
+            from io import BytesIO
+            resp = httpx.post(
+                "https://open.feishu.cn/open-apis/im/v1/images",
+                headers={"Authorization": f"Bearer {token}"},
+                data={"image_type": "message"},
+                files={"image": (filename, BytesIO(image_data), mime_type)},
+                timeout=15
+            )
+            result = resp.json()
+            if result.get("code") != 0:
+                logger.error(f"图片上传失败: {result}")
+                return False
+
+            image_key = result["data"]["image_key"]
+            logger.info(f"图片上传成功: {image_key}")
+
+            # 发送图片消息
+            payload = {
+                "receive_id": self.chat_id,
+                "msg_type": "image",
+                "content": json.dumps({"image_key": image_key})
+            }
+            return self._send_message(payload)
+
+        except Exception as e:
+            logger.error(f"截图推送异常: {e}")
+            return False
+
 
 # 全局实例
 _feishu_pusher: Optional[FeishuPusher] = None

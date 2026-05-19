@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
 每日推送脚本 - 定时推送到飞书
-Usage: python scripts/daily_push.py
+Usage: python scripts/daily_push.py [--screenshot PATH]
 Crontab: 0 9 * * 1-5 cd ~/workspace/wealth_guide && python scripts/daily_push.py
 """
 import asyncio
+import argparse
 import logging
 import sys
 from datetime import datetime
@@ -73,7 +74,7 @@ async def generate_report():
     return recommendation.model_dump(), result
 
 
-def push_report():
+def push_report(screenshot_path: str = None):
     """推送报告到飞书"""
     try:
         # 生成报告
@@ -84,7 +85,7 @@ def push_report():
 
         if not pusher.enabled:
             logger.warning("飞书推送未配置，跳过推送")
-            print("❌ 飞书 Webhook 未配置，请设置 FEISHU_WEBHOOK_URL 环境变量")
+            print("❌ 飞书推送未配置，请设置 FEISHU_APP_ID / FEISHU_APP_SECRET / FEISHU_CHAT_ID 环境变量")
             return False
 
         # 构建组合字典
@@ -108,11 +109,23 @@ def push_report():
         if success:
             logger.info("✅ 飞书日报推送成功")
             print("✅ 飞书日报推送成功")
-            return True
         else:
             logger.error("❌ 飞书日报推送失败")
             print("❌ 飞书日报推送失败")
-            return False
+
+        # 推送截图（可选）
+        if screenshot_path and Path(screenshot_path).exists():
+            screenshot_success = pusher.push_screenshot(str(screenshot_path))
+            if screenshot_success:
+                logger.info("✅ 截图推送成功")
+                print("✅ 截图推送成功")
+            else:
+                logger.error("❌ 截图推送失败")
+                print("❌ 截图推送失败")
+        elif screenshot_path:
+            logger.warning(f"截图文件不存在: {screenshot_path}")
+
+        return success
 
     except Exception as e:
         logger.error(f"推送过程出错: {e}")
@@ -121,10 +134,15 @@ def push_report():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Wealth Guide 每日推送")
+    parser.add_argument("--screenshot", "-s", type=str, default=None,
+                        help="前端页面截图路径，推送截图到飞书")
+    args = parser.parse_args()
+
     print("=" * 50)
     print("📊 Wealth Guide 每日推送")
     print(f"⏰ 执行时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 50)
 
-    success = push_report()
+    success = push_report(screenshot_path=args.screenshot)
     sys.exit(0 if success else 1)
