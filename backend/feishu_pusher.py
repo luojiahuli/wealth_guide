@@ -249,11 +249,11 @@ class FeishuPusher:
                     {"tag": "hr"},
                     # 操作建议
                     {"tag": "div", "text": {"tag": "lark_md", "content": "**💡 今日操作建议**"}},
-                    *action_elements if action_elements else [{"tag": "div", "text": {"tag": "lark_md", "content": "✅ 暂无调仓建议"}}],
+                    *(action_elements if action_elements else [{"tag": "div", "text": {"tag": "lark_md", "content": "✅ 暂无调仓建议"}}]),
                     {"tag": "hr"},
                     # 精选推荐
                     {"tag": "div", "text": {"tag": "lark_md", "content": "**🎯 精选推荐**"}},
-                    *pick_elements[:3] if pick_elements else [{"tag": "div", "text": {"tag": "lark_md", "content": "暂无推荐"}}],
+                    *(pick_elements[:3] if pick_elements else [{"tag": "div", "text": {"tag": "lark_md", "content": "暂无推荐"}}]),
                     {"tag": "hr"},
                     # 风险提示
                     {
